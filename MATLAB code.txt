@@ -1,0 +1,41 @@
+% Read the image (grayscale)
+input_image = imread('lena_gray.png');
+if size(input_image,3) == 3
+    input_image = rgb2gray(input_image); % Convert to grayscale if necessary
+end
+
+% Add impulse noise for testing (optional)
+noisy_image = imnoise(input_image, 'salt & pepper', 0.2);
+
+% Display the noisy image
+figure, imshow(noisy_image);
+title('Noisy Image');
+
+% Define the size of the neighborhood (e.g., 3x3 window)
+window_size = 3;
+pad_size = floor(window_size / 2);
+
+% Pad the noisy image with zeros on the boundary
+padded_image = padarray(noisy_image, [pad_size pad_size], 'symmetric');
+
+% Create an empty matrix for the output (filtered) image
+filtered_image = zeros(size(noisy_image));
+
+% Apply the near-neighbor filter
+[m, n] = size(noisy_image);
+for i = 1:m
+    for j = 1:n
+        % Extract the neighborhood window
+        window = padded_image(i:i+window_size-1, j:j+window_size-1);
+        
+        % Compute the median of the neighborhood
+        filtered_image(i, j) = median(window(:));
+    end
+end
+
+% Convert the result to uint8 type (since images are usually uint8)
+filtered_image = uint8(filtered_image);
+
+% Display the filtered image
+figure, imshow(filtered_image);
+title('Filtered Image (Impulse Noise Removal)');
